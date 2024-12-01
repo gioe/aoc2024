@@ -6,7 +6,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const input = fs
-  .readFileSync(__dirname + '/input.txt', 'utf8')
+  .readFileSync(__dirname + '/data.txt', 'utf8')
 
 function solve() {
     const tuples = input.split("\n")

@@ -1,34 +1,16 @@
-import * as fs from 'fs'
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url); 
-const __dirname = path.dirname(__filename);
-
-const input = fs
-  .readFileSync(__dirname + '/data.txt', 'utf8')
+import { returnLists } from '../shared';
 
 function solve() {
-    const tuples = input.split("\n")
-    const listA: number[] = []
-    const listB: number[] = []
+    const [listA, listB] = returnLists()
     
-    tuples.forEach((tuplesString: string) => {
-        const tuples = tuplesString.split("   ")
-        listA.push(Number(tuples[0]))
-        listB.push(Number(tuples[1]))
-    })
-    listA.sort()
-    listB.sort()
     const deltas: number[] = []
 
-    for (let x = 0; x < tuples.length; x++) {
+    for (let x = 0; x < listA.length; x++) {
         const delta = listB[x] - listA[x]
         deltas.push(delta < 0 ? delta * -1 : delta)
     }
     return deltas.reduce((a, b) => a + b)
 }
-
 
 const startTime = performance.now(); 
 const solution = solve();

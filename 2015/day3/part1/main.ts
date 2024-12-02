@@ -2,7 +2,6 @@ import { returnFileContents } from '../shared';
 
 function solve() {
     const contents = returnFileContents()
-    console.log(contents)
     return 1
 }
 

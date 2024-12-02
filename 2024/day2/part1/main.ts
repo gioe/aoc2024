@@ -1,35 +1,34 @@
 import { returnInput } from '../shared';
 
+function isSafe(readings: number[]) {
+    const allPositives = readings.every((value) => value > 0);
+    const allNegatives = readings.every((value) => value < 0);
+    if (readings.some((value) => {
+        return value == 0 || Math.abs(value) > 3
+    })) {
+       return false
+    } else if (allPositives || allNegatives){
+        return true
+    } else { return false }
+}
+
 function solve() {
-    const levels = returnInput().split("\n")
+    const reports = returnInput().split("\n")
+    let topology: number[][] = []
 
-    const safeLevels: number[] = []
-
-    for (let x = 0; x < levels.length; x++) {
-        const currentLevel = levels[x].split(" ")
-        let isSafe = true
-        let magnitudes: number[] =[]
-        for (let y = 0; y < currentLevel.length - 1; y++) {
-            const aValue = Number(currentLevel[y])
-            const bValue = Number(currentLevel[y + 1])
+    for (let x = 0; x < reports.length; x++) {
+        const levelReadings = reports[x].split(" ")
+        const levelChanges: number[] = []
+        for (let y = 0; y < levelReadings.length - 1; y++) {
+            const aValue = Number(levelReadings[y])
+            const bValue = Number(levelReadings[y + 1])
             const delta = bValue - aValue
-
-            if (delta == 0 || Math.abs(delta) > 3) {
-                isSafe = false;
-                break;
-            }
-            magnitudes.push(delta)
+            levelChanges.push(delta)
         }
-        if (isSafe) {
-            const allPositive = magnitudes.every((val) => val > 0)
-            const allNegative = magnitudes.every((val) => val < 0)
-            if (allPositive || allNegative) {
-                safeLevels.push(x)
-            }
-        }
+        topology.push(levelChanges)
     }
 
-    return safeLevels.length
+    return topology.filter((topology) => isSafe(topology)).length
 }
 
 const startTime = performance.now(); 

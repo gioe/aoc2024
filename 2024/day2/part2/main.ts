@@ -1,14 +1,17 @@
 import { returnInput } from '../shared';
 
 function safeWithRemoval(readings: number[]) {
-    for (let x = 0; x < readings.length; x++) {
-        console.log(`Original readings ${readings}`)
-        const tempReadings = readings;
-        tempReadings.splice(x, 1)
-        const splitArray = readings.splice(x, 1)
-        console.log(`New readings ${tempReadings}`)
+    let canBeSafe = false;
+    for (let x = 0; x < readings.length; x++) {        
+        const readingsCopy = [...readings]
+        readingsCopy.splice(x, 1)
+        const topology = calculateTopology(readingsCopy)
+        if (isSafe(topology)) {
+            canBeSafe = true
+            break;
+        }
     }
-    return true
+    return canBeSafe
 }
 
 function isSafe(readings: number[]) {
@@ -23,26 +26,30 @@ function isSafe(readings: number[]) {
     } else { return false }
 }
 
+function calculateTopology(levelReadings: number[]) {
+    const levelChanges: number[] = []
+    for (let y = 0; y < levelReadings.length - 1; y++) {
+        const aValue = levelReadings[y]
+        const bValue = levelReadings[y + 1]
+        const delta = bValue - aValue
+        levelChanges.push(delta)
+    }
+    return levelChanges
+}
+
 function solve() {
     const reports = returnInput().split("\n")
-    let topology: number[][] = []
+    let map = new Map<number[], boolean>()
 
     for (let x = 0; x < reports.length; x++) {
-        const levelReadings = reports[x].split(" ")
-        const levelChanges: number[] = []
-        for (let y = 0; y < levelReadings.length - 1; y++) {
-            const aValue = Number(levelReadings[y])
-            const bValue = Number(levelReadings[y + 1])
-            const delta = bValue - aValue
-            levelChanges.push(delta)
-        }
-        topology.push(levelChanges)
+        const levelReadings = reports[x].split(" ").map((value) => Number(value))
+        const topology = calculateTopology(levelReadings)
+        map.set(levelReadings, isSafe(topology))
     }
-    const definitelySafe = topology.filter((topology) => !isSafe(topology)).length
+    const safeLevelsCount = [...map].filter(([key, value]) => value).length
+    const fixableCount = [...map].filter(([key, value]) => !value).filter(([key, value]) => safeWithRemoval(key)).length
 
-    const coudlBeSafe = topology.filter((topology) => isSafe(topology)).filter((value) => safeWithRemoval(value)).length
-
-    return topology.filter((topology) => !isSafe(topology)).length
+    return safeLevelsCount + fixableCount
 }
 
 const startTime = performance.now(); 

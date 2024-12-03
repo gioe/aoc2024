@@ -1,43 +1,65 @@
 import { returnFileContents } from '../shared';
 
-function repeatsWithoutOverlap(characterArray: string[]) {
-    let repeatsWithoutOverlap = false
-    for (let x = 0; x < characterArray.length; x++) {
-        const substring = characterArray[x] + characterArray[x + 1]
-        for (let y = x + 2; y < characterArray.length; y++) {
-            const nextTwo = characterArray[y] + characterArray[y + 1]
-            if (substring == nextTwo) {
-                repeatsWithoutOverlap = true
-                break;
+const size = 1000;
+const board: number[][] = []
+
+function buildBoard() {
+    for (let x = 0; x < size; x++) {
+        const row: number[] = []
+        for (let x = 0; x < size; x++) {
+            row.push(0)
+        }
+        board.push(row)
+    }
+    return board;
+}
+
+function turnOnRange(startCoordinates: number[], endCoordinates: number[]) {
+
+    for (let x = startCoordinates[0]; x <= endCoordinates[0]; x++) {
+        const lightArray = board[x]
+        for (let y = startCoordinates[1]; y <= endCoordinates[1]; y++) {
+            const value = lightArray[y]
+            lightArray[y] = value + 1
+        }
+    }
+}
+
+function toggleRange(startCoordinates: number[], endCoordinates: number[]) {
+
+    for (let x = startCoordinates[0]; x <= endCoordinates[0]; x++) {
+        const lightArray = board[x]
+        for (let y = startCoordinates[1]; y <= endCoordinates[1]; y++) {
+            const value = lightArray[y]
+            lightArray[y] = value + 2
+        }
+    }
+}
+
+function turnOffRange(startCoordinates: number[], endCoordinates: number[]) {
+
+    for (let x = startCoordinates[0]; x <= endCoordinates[0]; x++) {
+        const lightArray = board[x]
+        for (let y = startCoordinates[1]; y <= endCoordinates[1]; y++) {
+            const value = lightArray[y]
+            if (value > 0) {
+                lightArray[y] = value - 1
             }
         }
-        if (repeatsWithoutOverlap) {
-            break;
-        }
     }
-    return repeatsWithoutOverlap
 }
 
-function repeatsWithIntermediary(characterArray: string[]) {
-    let repeatsWithIntermediary = false
-    for (let x = 0; x < characterArray.length; x++) {
-        const currentCharacter = characterArray[x]
-        const comparisonCharacter = characterArray[x + 2]
-
-        if (currentCharacter == comparisonCharacter) {
-            repeatsWithIntermediary = true
-            break;
-        }
-    }
-    return repeatsWithIntermediary
-}
 
 function solve() {
     const contents = returnFileContents().split("\n")
-    return contents.filter((value: string) => {
-        const characterArray = value.split("")
-        return repeatsWithIntermediary(characterArray) && repeatsWithoutOverlap(characterArray)
-    }).length
+    buildBoard()
+    contents.forEach((value) => {
+        const stringContents = value.split(' ')
+        if (stringContents.includes('toggle')) { toggleRange(stringContents[1].split(',').map(Number), stringContents[3].split(',').map(Number)) } 
+        else if (stringContents.includes(`off`)) { turnOffRange(stringContents[2].split(',').map(Number), stringContents[4].split(',').map(Number)) } 
+        else if (stringContents.includes(`on`)) { turnOnRange(stringContents[2].split(',').map(Number), stringContents[4].split(',').map(Number)) }
+    })
+    return board.map((value) => value.reduce((a, b) => a + b)).reduce((a, b) => a + b)
 }
 
 const startTime = performance.now(); 

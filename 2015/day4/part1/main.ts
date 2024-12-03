@@ -8,12 +8,8 @@ export const md5 = (contents: string) => crypto.createHash('md5').update(content
 
 function solve() {
     var key = returnFileContents()
-    let foundFiveZeros = false;
     let int = 0
-    while (!foundFiveZeros) {
-        console.log(`Int is ${int}`)
-        const hash = md5(key + String(int))
-        foundFiveZeros = startsWithFiveZeros(hash)
+    while (!startsWithFiveZeros(md5(key + String(int)))) {
         int++
     }
     return int

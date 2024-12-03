@@ -1,11 +1,47 @@
 import { returnFileContents } from '../shared';
 
 function solve() {
-    const contents = returnFileContents()
-    let currentFloor = 0
-    return contents
-    .split("").map((value) => value === "(" ? ++currentFloor : --currentFloor).indexOf(-1) + 1
+    const contents = returnFileContents().split("")
+    const map = new Map<string, number>()
+    const startingLocation: [number, number] = [0,0]
+    var santaLocation: [number, number] = startingLocation
+    var robotLocation: [number, number] = startingLocation
+    map.set(JSON.stringify(startingLocation), 2)
+
+    contents.forEach((value, index) => {
+        const isRobotInstruction = index % 2 === 1
+        const mutableValue: [number, number] = isRobotInstruction ? [...robotLocation] : [...santaLocation]
+        switch (value) {
+            case (">"): {
+                mutableValue[1] = ++mutableValue[1]
+                break;
+            }
+            case ("<"): {
+                mutableValue[1] = --mutableValue[1]
+                break;
+            }
+            case ("^"): {
+                mutableValue[0] = ++mutableValue[0]
+                break;
+            }
+            case ("v"): {
+                mutableValue[0] = --mutableValue[0]
+                break;
+            }
+        }
+       
+        let count = map.get(JSON.stringify(mutableValue)) == undefined ? 0 : map.get(JSON.stringify(mutableValue))
+    
+        map.set(JSON.stringify(mutableValue), ++count)
+        isRobotInstruction ? robotLocation = [...mutableValue] : santaLocation = [...mutableValue]
+
+    })
+
+    return [...map.values()].filter((value) => value > 0).length
+
 }
+
+
 const startTime = performance.now(); 
 const solution = solve();
 const endTime = performance.now();

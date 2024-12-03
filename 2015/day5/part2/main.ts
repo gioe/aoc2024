@@ -1,21 +1,44 @@
 import { returnFileContents } from '../shared';
-import crypto from "crypto"
 
-const key = 'bgvyzdsv'
-
-function startsWithSixZeros(hash: string) {
-    return hash.slice(0, 6) === "000000"
+function repeatsWithoutOverlap(characterArray: string[]) {
+    let repeatsWithoutOverlap = false
+    for (let x = 0; x < characterArray.length; x++) {
+        const substring = characterArray[x] + characterArray[x + 1]
+        for (let y = x + 2; y < characterArray.length; y++) {
+            const nextTwo = characterArray[y] + characterArray[y + 1]
+            if (substring == nextTwo) {
+                repeatsWithoutOverlap = true
+                break;
+            }
+        }
+        if (repeatsWithoutOverlap) {
+            break;
+        }
+    }
+    return repeatsWithoutOverlap
 }
-export const md5 = (contents: string) => crypto.createHash('md5').update(contents).digest("hex");
+
+function repeatsWithIntermediary(characterArray: string[]) {
+    let repeatsWithIntermediary = false
+    for (let x = 0; x < characterArray.length; x++) {
+        const currentCharacter = characterArray[x]
+        const comparisonCharacter = characterArray[x + 2]
+
+        if (currentCharacter == comparisonCharacter) {
+            repeatsWithIntermediary = true
+            break;
+        }
+    }
+    return repeatsWithIntermediary
+}
 
 function solve() {
-    let int = 0
-    while (!startsWithSixZeros(md5(key + String(int)))) {
-        int++
-    }
-    return int
+    const contents = returnFileContents().split("\n")
+    return contents.filter((value: string) => {
+        const characterArray = value.split("")
+        return repeatsWithIntermediary(characterArray) && repeatsWithoutOverlap(characterArray)
+    }).length
 }
-
 
 const startTime = performance.now(); 
 const solution = solve();

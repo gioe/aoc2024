@@ -1,15 +1,16 @@
 import { returnFileContents } from '../shared';
 import crypto from "crypto"
+
 const key = 'bgvyzdsv'
 
-function startsWithFiveZeros(hash: string) {
-    return hash.startsWith("00000")
+function startsWithSixZeros(hash: string) {
+    return hash.slice(0, 6) === "000000"
 }
 export const md5 = (contents: string) => crypto.createHash('md5').update(contents).digest("hex");
 
 function solve() {
     let int = 0
-    while (!startsWithFiveZeros(md5(key + String(int)))) {
+    while (!startsWithSixZeros(md5(key + String(int)))) {
         int++
     }
     return int

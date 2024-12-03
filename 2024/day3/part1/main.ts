@@ -1,4 +1,6 @@
 import { returnInput } from '../shared';
+const multiplierStart= 'mul('
+const multiplierEnd = ')'
 
 // Should probably impprove this so that the algorithm never results in false positives but leaving it for now.
 
@@ -9,20 +11,17 @@ function convertToArithmetic(value: string[]): number {
     return isNaN(response) ? 0 : response
 }
 
-
-function solve() {
-    const content = returnInput().split("")
+function extractEquations(content: string[]) {
     const values: string[][]  = []
-
     for (let x = 0; x < content.length; x++) {
-        let lookForward = x+4
+        let lookForward = x + 4
         const window = content.slice(x, lookForward).join("")
-        let inMulWindow = window == 'mul('
-        const equation: string[]  = []
+        let inMulWindow = window == multiplierStart
+        const equation: string[] = []
 
         while (inMulWindow) {
             const nextChar = content[lookForward]
-            inMulWindow = !(content[lookForward] == ')')
+            inMulWindow = !(content[lookForward] == multiplierEnd)
             if (inMulWindow) {
                 equation.push(nextChar);
             }
@@ -30,6 +29,13 @@ function solve() {
         }
         values.push(equation)
     }
+    return values
+}
+
+function solve() {
+    const content = returnInput().split("")
+
+    const values = extractEquations(content)
 
     return values.filter((value) => value.length > 0).map((value) => convertToArithmetic(value)).reduce((a, b) => a+ b)
 }
